@@ -36,6 +36,5 @@ public class HelloWorldController {
         Locale locale = LocaleContextHolder.getLocale();
         return messageSource.getMessage("good.morning.message", null,
                 "Default Message", locale);
-        //return "Hello World!";
     }
 }

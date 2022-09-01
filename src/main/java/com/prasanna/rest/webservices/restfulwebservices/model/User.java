@@ -1,5 +1,6 @@
 package com.prasanna.rest.webservices.restfulwebservices.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,9 @@ public class User {
 
     private int id;
     @Size(min = 2,message = "Name should have at least 2 characters.")
+    @JsonProperty("user_name")
     private String name;
     @Past(message = "DOB should be in the past.")
+    @JsonProperty("birth_date")
     private LocalDate dob;
 }
