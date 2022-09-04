@@ -1,8 +1,8 @@
 package com.prasanna.rest.webservices.restfulwebservices.controller;
 
-import com.prasanna.rest.webservices.restfulwebservices.dto.UserDao;
 import com.prasanna.rest.webservices.restfulwebservices.exception.UserNotFoundException;
 import com.prasanna.rest.webservices.restfulwebservices.model.UserDetails;
+import com.prasanna.rest.webservices.restfulwebservices.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -13,29 +13,30 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-public class WebServiceController {
+public class WebServiceControllerJPA {
     @Autowired
-    private UserDao userDao;
+    private UserRepo userRepo;
 
-    @GetMapping("/users")
+    @GetMapping("/jpa/users")
     public List<UserDetails> retrieveAllUsers() {
-        return userDao.findAll();
+        return userRepo.findAll();
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/jpa/users/{id}")
     public UserDetails retrieveSingleUsers(@PathVariable int id) {
-        UserDetails userDetails = userDao.findSingleUser(id);
-        if (userDetails == null)
+        Optional<UserDetails> userDetails = userRepo.findById(id);
+        if (userDetails.isEmpty())
             throw new UserNotFoundException("id: " + id);
-        return userDetails;
+        return userDetails.get();
     }
 
-    @GetMapping("/users/entity/{id}")
+    @GetMapping("/jpa/users/entity/{id}")
     public EntityModel<UserDetails> retrieveEntityUsers(@PathVariable int id) {
-        UserDetails userDetails = userDao.findSingleUser(id);
-        if (userDetails == null)
+        Optional<UserDetails> userDetails = userRepo.findById(id);
+        if (userDetails.isEmpty())
             throw new UserNotFoundException("id: " + id);
 
         /*
@@ -45,17 +46,17 @@ public class WebServiceController {
                 WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
                         .methodOn(this.getClass()).retrieveAllUsers());
 
-        return EntityModel.of(userDetails).add(linkBuilder.withRel("all-users"));
+        return EntityModel.of(userDetails.get()).add(linkBuilder.withRel("all-users"));
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/jpa/users/{id}")
     public void deleteUsers(@PathVariable int id) {
-        userDao.deleteUser(id);
+        userRepo.deleteById(id);
     }
 
-    @PostMapping("/users")
+    @PostMapping("/jpa/users")
     public ResponseEntity<UserDetails> createUser(@Valid @RequestBody UserDetails userDetails) {
-        UserDetails savedUserDetails = userDao.createUser(userDetails);
+        UserDetails savedUserDetails = userRepo.save(userDetails);
         URI location =
                 ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                         .buildAndExpand(savedUserDetails.getId()).toUri();

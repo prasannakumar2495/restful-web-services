@@ -1,6 +1,6 @@
 package com.prasanna.rest.webservices.restfulwebservices.dto;
 
-import com.prasanna.rest.webservices.restfulwebservices.model.User;
+import com.prasanna.rest.webservices.restfulwebservices.model.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -10,33 +10,33 @@ import java.util.function.Predicate;
 
 @Component
 public class UserDao {
-    private static final List<User> users = new ArrayList<>();
+    private static final List<UserDetails> USER_DETAILS = new ArrayList<>();
     private static int userCount = 0;
 
     static {
-        users.add(new User(++userCount, "PK", LocalDate.now().minusYears(30)));
-        users.add(new User(++userCount, "Prasanna", LocalDate.now().minusYears(35)));
-        users.add(new User(++userCount, "Kumar", LocalDate.now().minusYears(40)));
+        USER_DETAILS.add(new UserDetails(++userCount, "PK", LocalDate.now().minusYears(30)));
+        USER_DETAILS.add(new UserDetails(++userCount, "Prasanna", LocalDate.now().minusYears(35)));
+        USER_DETAILS.add(new UserDetails(++userCount, "Kumar", LocalDate.now().minusYears(40)));
     }
 
-    public List<User> findAll() {
-        return users;
+    public List<UserDetails> findAll() {
+        return USER_DETAILS;
     }
 
-    public User findSingleUser(int id) {
-        Predicate<? super User> predicate = user -> user.getId() == id;
-        //return users.stream().filter(user -> user.getId() == id).findFirst().get();
-        return users.stream().filter(predicate).findFirst().orElse(null);
+    public UserDetails findSingleUser(int id) {
+        Predicate<? super UserDetails> predicate = userDetails -> userDetails.getId() == id;
+        //return USER_DETAILS.stream().filter(user -> user.getId() == id).findFirst().get();
+        return USER_DETAILS.stream().filter(predicate).findFirst().orElse(null);
     }
 
-    public User createUser(User user) {
-        user.setId(++userCount);
-        users.add(user);
-        return user;
+    public UserDetails createUser(UserDetails userDetails) {
+        userDetails.setId(++userCount);
+        USER_DETAILS.add(userDetails);
+        return userDetails;
     }
 
     public void deleteUser(int id) {
 
-        users.removeIf(user -> user.getId() == id);
+        USER_DETAILS.removeIf(userDetails -> userDetails.getId() == id);
     }
 }
