@@ -1,7 +1,9 @@
 package com.prasanna.rest.webservices.restfulwebservices.controller;
 
 import com.prasanna.rest.webservices.restfulwebservices.exception.UserNotFoundException;
+import com.prasanna.rest.webservices.restfulwebservices.model.Post;
 import com.prasanna.rest.webservices.restfulwebservices.model.UserDetails;
+import com.prasanna.rest.webservices.restfulwebservices.repository.PostRepo;
 import com.prasanna.rest.webservices.restfulwebservices.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
@@ -19,6 +21,9 @@ import java.util.Optional;
 public class WebServiceControllerJPA {
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private PostRepo postRepo;
 
     @GetMapping("/jpa/users")
     public List<UserDetails> retrieveAllUsers() {
@@ -61,5 +66,25 @@ public class WebServiceControllerJPA {
                 ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                         .buildAndExpand(savedUserDetails.getId()).toUri();
         return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping("/jpa/users/{id}/posts")
+    public List<Post> retrievePostForAUser(@PathVariable int id) {
+        Optional<UserDetails> userDetails = userRepo.findById(id);
+        if (userDetails.isEmpty())
+            throw new UserNotFoundException("id: " + id);
+
+        return userDetails.get().getPostList();
+    }
+
+    @PostMapping("/jpa/users/{id}/posts")
+    public Post createPostForUser(@PathVariable int id,
+                                  @Valid @RequestBody Post post) {
+        Optional<UserDetails> userDetails = userRepo.findById(id);
+        if (userDetails.isEmpty())
+            throw new UserNotFoundException("id: " + id);
+
+        post.setUserDetails(userDetails.get());
+        return postRepo.save(post);
     }
 }
